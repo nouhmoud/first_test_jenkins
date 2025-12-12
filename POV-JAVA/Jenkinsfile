@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    tools {
+        // Fait référence au nom 'maven' que tu as configuré dans Manage Jenkins -> Global Tool Configuration
+        maven 'maven' 
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                // La commande qui a réussi localement !
+                sh 'mvn clean install'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                // Pour l'instant, on laisse l'étape 'Test' vide ou on la combine avec 'Build'
+                // L'étape 'mvn clean install' exécute déjà les tests.
+                echo 'Tests passed.'
+            }
+        }
+        // Tu ajouteras l'étape 'Deploy' plus tard
+    }
+}
