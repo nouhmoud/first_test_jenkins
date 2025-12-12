@@ -10,9 +10,6 @@ pipeline {
         TARGET_HOST = '127.0.0.1' 
         TARGET_USER = 'ELITEBOOK' 
         TARGET_DIR = 'C:/Temp' 
-        // ********************************************
-        // CORRECTION : Le nom du fichier JAR est ici.
-        // ********************************************
         JAR_FILE = 'jenkins-demo-0.0.1-SNAPSHOT.jar'
     }
 
@@ -25,7 +22,10 @@ pipeline {
         stage('Build and Test') {
             steps {
                 echo 'Building the application and running tests with Maven...'
-                sh 'mvn clean install'
+                // ********************************************
+                // CORRECTION : sh remplacé par bat
+                // ********************************************
+                bat 'mvn clean install' 
             }
         }
         stage('Deploy') { 
@@ -34,8 +34,10 @@ pipeline {
                 
                 // Utilisation de sshagent pour déverrouiller les identifiants SSH stockés
                 sshagent(credentials: [DEPLOY_CREDENTIALS]) {
-                    // scp (Secure Copy) utilise la variable d'environnement ${JAR_FILE}
-                    sh "scp POV-JAVA/target/${JAR_FILE} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
+                    // ********************************************
+                    // CORRECTION : sh remplacé par bat pour la commande scp
+                    // ********************************************
+                    bat "scp POV-JAVA/target/${JAR_FILE} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 }
                 
                 echo 'Deployment copy finished.'
