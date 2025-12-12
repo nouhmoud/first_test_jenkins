@@ -5,16 +5,11 @@ pipeline {
         maven 'maven' 
     }
     
-    // Ajout des variables d'environnement
     environment {
-        // L'ID que tu as créé dans Jenkins > Gérer les identifiants
         DEPLOY_CREDENTIALS = 'ssh_deploy_server' 
-        // L'adresse de ta machine locale (la même que Jenkins)
         TARGET_HOST = '127.0.0.1' 
-        // L'utilisateur de ta machine locale
         TARGET_USER = 'ELITEBOOK' 
-        // Le dossier de destination temporaire pour le JAR (standard sur Windows/Linux)
-        TARGET_DIR = 'C:/Temp' // Utilisons un dossier Windows plus typique
+        TARGET_DIR = 'C:/Temp' 
     }
 
     stages {
@@ -30,15 +25,19 @@ pipeline {
             }
         }
         stage('Deploy') { 
+            // ************************************************************
+            // CORRECTION DE SYNTAXE : 
+            // La variable est déclarée ici (dans le scope du stage)
+            // ************************************************************
+            def jarName = "jenkins-demo-0.0.1-SNAPSHOT.jar"
+            
             steps {
                 echo "Copying application to ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
-                
-                // Le nom du fichier JAR généré par Maven
-                def jarName = "jenkins-demo-0.0.1-SNAPSHOT.jar"
                 
                 // Utilisation de sshagent pour déverrouiller les identifiants SSH stockés
                 sshagent(credentials: [DEPLOY_CREDENTIALS]) {
                     // scp (Secure Copy) copie le JAR vers le serveur cible
+                    // NOTE : Nous utilisons directement la variable Groovy 'jarName' ici.
                     sh "scp POV-JAVA/target/${jarName} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 }
                 
