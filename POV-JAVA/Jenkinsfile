@@ -1,27 +1,31 @@
 pipeline {
     agent any
-
+    
     tools {
-        // Fait référence au nom 'maven' que tu as configuré dans Manage Jenkins -> Global Tool Configuration
+        // Fait référence au nom 'maven' que tu as configuré (Tâche 4)
         maven 'maven' 
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building the application...'
-                // La commande qui a réussi localement !
+                echo 'Cloning repository from GitHub...'
+            }
+        }
+        stage('Build and Test') {
+            steps {
+                echo 'Building the application and running tests with Maven...'
                 sh 'mvn clean install'
             }
         }
-        stage('Test') {
+        // **********************************************
+        // * NOUVELLE ÉTAPE : DEPLOIEMENT *
+        // **********************************************
+        stage('Deploy') { 
             steps {
-                echo 'Running tests...'
-                // Pour l'instant, on laisse l'étape 'Test' vide ou on la combine avec 'Build'
-                // L'étape 'mvn clean install' exécute déjà les tests.
-                echo 'Tests passed.'
+                echo 'Deployment stage added. We will configure SSH details next.'
+                // C'est ici que nous insérerons le code de connexion SSH
             }
         }
-        // Tu ajouteras l'étape 'Deploy' plus tard
     }
 }
