@@ -23,20 +23,20 @@ pipeline {
             steps {
                 echo 'Building the application and running tests with Maven...'
                 // ********************************************
-                // CORRECTION : sh remplacé par bat
+                // CORRECTION : Utiliser 'dir' pour se placer dans le sous-dossier POV-JAVA
                 // ********************************************
-                bat 'mvn clean install' 
+                dir('POV-JAVA') {
+                    bat 'mvn clean install' 
+                }
             }
         }
         stage('Deploy') { 
             steps {
                 echo "Copying application to ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 
-                // Utilisation de sshagent pour déverrouiller les identifiants SSH stockés
+                // Note: La source 'POV-JAVA/target/${JAR_FILE}' reste correcte ici car 
+                // Jenkins revient à la racine de l'espace de travail après le bloc 'dir'.
                 sshagent(credentials: [DEPLOY_CREDENTIALS]) {
-                    // ********************************************
-                    // CORRECTION : sh remplacé par bat pour la commande scp
-                    // ********************************************
                     bat "scp POV-JAVA/target/${JAR_FILE} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 }
                 
