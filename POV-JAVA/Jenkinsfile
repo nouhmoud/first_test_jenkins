@@ -2,8 +2,19 @@ pipeline {
     agent any
     
     tools {
-        // Fait référence au nom 'maven' que tu as configuré (Tâche 4)
         maven 'maven' 
+    }
+    
+    // Ajout des variables d'environnement
+    environment {
+        // L'ID que tu as créé dans Jenkins > Gérer les identifiants
+        DEPLOY_CREDENTIALS = 'ssh_deploy_server' 
+        // L'adresse de ta machine locale (la même que Jenkins)
+        TARGET_HOST = '127.0.0.1' 
+        // L'utilisateur de ta machine locale
+        TARGET_USER = 'ELITEBOOK' 
+        // Le dossier de destination temporaire pour le JAR (standard sur Windows/Linux)
+        TARGET_DIR = 'C:/Temp' // Utilisons un dossier Windows plus typique
     }
 
     stages {
@@ -18,13 +29,20 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
-        // **********************************************
-        // * NOUVELLE ÉTAPE : DEPLOIEMENT *
-        // **********************************************
         stage('Deploy') { 
             steps {
-                echo 'Deployment stage added. We will configure SSH details next.'
-                // C'est ici que nous insérerons le code de connexion SSH
+                echo "Copying application to ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
+                
+                // Le nom du fichier JAR généré par Maven
+                def jarName = "jenkins-demo-0.0.1-SNAPSHOT.jar"
+                
+                // Utilisation de sshagent pour déverrouiller les identifiants SSH stockés
+                sshagent(credentials: [DEPLOY_CREDENTIALS]) {
+                    // scp (Secure Copy) copie le JAR vers le serveur cible
+                    sh "scp POV-JAVA/target/${jarName} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
+                }
+                
+                echo 'Deployment copy finished.'
             }
         }
     }
