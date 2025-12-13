@@ -10,7 +10,10 @@ pipeline {
         TARGET_HOST = '127.0.0.1' 
         TARGET_USER = 'ELITEBOOK' 
         TARGET_DIR = 'C:/Temp' 
-        JAR_FILE = 'jenkins-demo-0.0.1-SNAPSHOT.jar'
+        // ******************************************************
+        // CORRECTION MAJEURE: Le nom du JAR doit correspondre au nom du projet Maven
+        // ******************************************************
+        JAR_FILE = 'Point-of-sale-0.0.1-SNAPSHOT.jar'
     }
 
     stages {
@@ -22,9 +25,6 @@ pipeline {
         stage('Build and Test') {
             steps {
                 echo 'Building the application and running tests with Maven...'
-                // ********************************************
-                // CORRECTION : Utiliser 'dir' pour se placer dans le sous-dossier POV-JAVA
-                // ********************************************
                 dir('POV-JAVA') {
                     bat 'mvn clean install' 
                 }
@@ -34,9 +34,10 @@ pipeline {
             steps {
                 echo "Copying application to ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 
-                // Note: La source 'POV-JAVA/target/${JAR_FILE}' reste correcte ici car 
-                // Jenkins revient à la racine de l'espace de travail après le bloc 'dir'.
+                // Le chemin d'accès au JAR est maintenant correct :
+                // POV-JAVA/target/Point-of-sale-0.0.1-SNAPSHOT.jar
                 sshagent(credentials: [DEPLOY_CREDENTIALS]) {
+                    // La commande SCP est maintenant correcte avec le bon nom de fichier
                     bat "scp POV-JAVA/target/${JAR_FILE} ${TARGET_USER}@${TARGET_HOST}:${TARGET_DIR}"
                 }
                 
